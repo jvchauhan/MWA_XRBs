@@ -53,6 +53,9 @@ applysolutions ${obsnum}.ms ${solutions}
 
 mv ${solutions} ${obsnum}_solutions.bin
 
+### ploting phase and amp solutions for the tiles
+
+singularity exec /pawsey/mwa/singularity/python/python-ubuntu-20.04_2020-10-02.sif ./astro/mwasci/jchauhan/mwa-calplots/aocal_plot.py /astro/mwasci/jchauhan/MWA_XRBs/processing/${obsnum}/${obsnum}_solutions.bin
 
 
 }
