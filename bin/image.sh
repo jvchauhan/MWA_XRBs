@@ -44,6 +44,7 @@ singularity exec /pawsey/mwa/singularity/mwa-reduce/mwa-reduce_2020.09.15.sif ap
 ### change center
 ##### NOTE need to include the below syntax
 # chgcentre -minw -shiftback ${datadir}/${obsnum}/${obsnum}.ms
+singularity exec /astro/mwasci/jchauhan/singularity_local/mwatools chgcentre -minw -shiftback ${obsnum}.ms
 
 
 
