@@ -52,17 +52,43 @@ singularity exec /astro/mwasci/jchauhan/singularity_local/mwatools chgcentre -mi
 ### image
 imsize="-size 9000 9000"
 pixscale="-scale 16asec"
-clean="-join-polarizations -multiscale -mgain 0.8 -niter 100000 -auto-mask 3 -auto-threshold 1.2 -local-rms -circular-beam"
+clean="-multiscale -mgain 0.8 -niter 100000 -auto-mask 3 -auto-threshold 1.2 -local-rms -circular-beam"
 
-singularity exec /pawsey/mwa/singularity/wsclean/wsclean_2.9.2-build-1.sif wsclean -name ${obsnum}-2m ${imsize} \
-      -abs-mem 120 \
-      -weight briggs 0.0 -mfs-weighting ${pixscale} \
-      -pol xx,yy,xy,yx -minuv-l 30 \
-      ${clean} ${obsnum}.ms
+## using appybeam from wsclean
+singularity exec /astro/mwasci/jchauhan/singularity_local/mwatools wsclean -name ${obsnum}-2m ${imsize}\
+       -abs-mem 120 \
+       -weight briggs 0.0 -mfs-weighting ${pixscale} \
+       -apply-primary-beam -mwa-path /pawsey/mwa -pol i -minuv-l 30 \
+       ${clean} ${obsnum}.ms       
 
-singularity exec /pawsey/mwa/singularity/mwa-reduce/mwa-reduce_2020.09.15.sif beam -2016 -proto ${obsnum}-2m-XX-image.fits -ms ${obsnum}.ms -name beam-MFS
+### self cal
+singularity exec /pawsey/mwa/singularity/mwa-reduce/mwa-reduce_2020.09.15.sif calibrate -absmem ${mem} -j ${cores} -minuv 60 ${obsnum}.ms solutions-selfcal.bin
 
-singularity exec /pawsey/mwa/singularity/mwa-reduce/mwa-reduce_2020.09.15.sif pbcorrect ${obsnum}-2m image.fits beam-MFS ${obsnum}-2m-pbcorr
+## apply selfcal solutions to ms
+singularity exec /pawsey/mwa/singularity/mwa-reduce/mwa-reduce_2020.09.15.sif applysolutions ${obsnum}.ms solutions-selfcal.bin
+
+## image again after selfcal
+singularity exec /astro/mwasci/jchauhan/singularity_local/mwatools wsclean -name ${obsnum}-2m-selfcal ${imsize}\
+       -abs-mem 120 \
+       -weight briggs 0.0 -mfs-weighting ${pixscale} \
+       -apply-primary-beam -mwa-path /pawsey/mwa -pol i -minuv-l 30 \
+       ${clean} ${obsnum}.ms
+
+
+#-size 100 100 -scale 1amin -weight natural -apply-primary-beam -mwa-path /pawsey/mwa ${obsnum}.ms
+
+
+#singularity exec /pawsey/mwa/singularity/wsclean/wsclean_2.9.2-build-1.sif wsclean -name ${obsnum}-2m ${imsize} \
+#      -abs-mem 120 \
+#      -weight briggs 0.0 -mfs-weighting ${pixscale} \
+#      -pol xx,yy,xy,yx -minuv-l 30 \
+#      ${clean} ${obsnum}.ms
+
+#-join-polarizations
+
+#singularity exec /pawsey/mwa/singularity/mwa-reduce/mwa-reduce_2020.09.15.sif beam -2016 -proto ${obsnum}-2m-XX-image.fits -ms ${obsnum}.ms -name beam-MFS
+
+#singularity exec /pawsey/mwa/singularity/mwa-reduce/mwa-reduce_2020.09.15.sif pbcorrect ${obsnum}-2m image.fits beam-MFS ${obsnum}-2m-pbcorr
 
 
 
