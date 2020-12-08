@@ -1,9 +1,9 @@
 #! /bin/bash -l
 #BATCH --export=NONE
 #SBATCH -p workq
-#SBATCH --time=12:00:00
-#SBATCH --ntasks=10
-#SBATCH --mem=10GB
+#SBATCH --time=24:00:00
+#SBATCH --ntasks=6
+#SBATCH --mem=8GB
 #SBATCH -J download
 #SBATCH --mail-type FAIL,TIME_LIMIT,TIME_LIMIT_90
 #SBATCH --mail-user jaimwalogs@gmail.com
