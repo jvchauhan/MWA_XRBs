@@ -34,6 +34,26 @@ cd ${base}/processing/${obsnum}
 mem=120
 cores=28
 
+#----------------#
+#cd ${datadir}/${obsnum}
+
+## setting up alias for fitshead to run from container
+alias fitsheader="singularity exec /pawsey/mwa/singularity/python/python_latest.sif fitsheader"
+
+ra=$(fitsheader ${obsnum}.metafits | grep "RA of pointing center" | awk '{print $3}')
+
+dec=$(fitsheader ${obsnum}.metafits | grep "Dec of pointing center" | awk '{print $3}')
+
+## setting up alias for python to run from container
+alias MyPython="singularity exec /pawsey/mwa/singularity/python/python_latest.sif python"
+
+coords=$(MyPython -c "from astropy.coordinates import SkyCoord; from astropy import units as u; coords = SkyCoord(ra=${ra}*u.deg, dec=${dec}*u.deg).to_string('hmsdms'); print(coords)")
+
+singularity exec /astro/mwasci/jchauhan/singularity_local/mwatools chgcentre ${obsnum}.ms $coords
+#----------------#
+
+
+
 solutions=${base}processing/${calibration_obs}/${calibration_obs}_solutions.bin
 
 
